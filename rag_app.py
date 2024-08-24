@@ -1,4 +1,3 @@
-# rag_app.py
 from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
@@ -30,8 +29,7 @@ class RAGApp:
             "https://www.archives.gov/files/about/laws/basic-laws-book-2016.pdf",
             "https://socialsciences.exeter.ac.uk/media/universityofexeter/schoolofhumanitiesandsocialsciences/law/pdfs/The_Common_Law_in_India.pdf",
             "https://dopt.gov.in/sites/default/files/Revised_AIS_Rule_Vol_I_Rule_01.pdf",
-            
-        ] 
+        ]
 
         docs = []
         for url in urls:
@@ -57,10 +55,10 @@ class RAGApp:
         self.document_chain = create_stuff_documents_chain(self.llm, self.prompt)
 
     def get_answer(self, question: str) -> str:
-        relevant_docs = self.retriever.invoke({"input": question})
+        relevant_docs = self.retriever.get_relevant_documents(question)  # Use appropriate method
         context = "\n".join([doc.page_content for doc in relevant_docs])
         
-        response = self.document_chain.invoke({
+        response = self.document_chain.run({
             "input": question,
             "context": [Document(page_content=context)]
         })
