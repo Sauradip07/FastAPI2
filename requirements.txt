@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+pydantic
+sse-starlette
+# Add any other dependencies your project needs
