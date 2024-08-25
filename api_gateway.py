@@ -1,31 +1,23 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from rag_app import rag_app  # Import the initialized RAGApp instance
+from app.routes import question, task, health
 
 app = FastAPI()
-
-# Pydantic model for the request body
-class Question(BaseModel):
-    question: str
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/ask")
-def ask_question(question: Question):
-    try:
-        answer = rag_app.get_answer(question.question)
-        return {"question": question.question, "answer": answer}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# Include routers
+app.include_router(question.router)
+app.include_router(task.router)
+app.include_router(health.router)
 
-@app.get("/health")
-def health_check():
-    return {"status": "API is running successfully"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
